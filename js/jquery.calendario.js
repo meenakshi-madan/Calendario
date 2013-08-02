@@ -34,6 +34,7 @@
 			...
 		}
 		*/
+		caldata : {},
 		weeks : [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
 		weekabbrs : [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
 		months : [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
@@ -90,7 +91,7 @@
 		},
 		// Calendar logic based on http://jszen.blogspot.pt/2007/03/how-to-build-simple-calendar-with.html
 		_generateTemplate : function( callback ) {
-
+			console.log("generateTemplate called");
 			var head = this._getHead(),
 				body = this._getBody(),
 				rowClass;
@@ -110,6 +111,7 @@
 		},
 		_getHead : function() {
 
+			console.log("getHead called");
 			var html = '<div class="fc-head">';
 		
 			for ( var i = 0; i <= 6; i++ ) {
@@ -130,6 +132,7 @@
 		},
 		_getBody : function() {
 
+			console.log("getBody called");
 			var d = new Date( this.year, this.month + 1, 0 ),
 				// number of days in the month
 				monthLength = d.getDate(),
@@ -162,13 +165,16 @@
 						// this day is:
 						var strdate = ( this.month + 1 < 10 ? '0' + ( this.month + 1 ) : this.month + 1 ) + '-' + ( day < 10 ? '0' + day : day ) + '-' + this.year,
 							dayData = this.caldata[ strdate ];
+							console.log(dayData);
+						var mmcrossed = false;
 
 						if( dayData ) {
 							content = dayData;
+							mmcrossed = true;
 						}
 
 						if( content !== '' ) {
-							inner += '<div>' + content + '</div>';
+							inner += '<div class="mm-content" style="display:none">' + content + '</div>';
 						}
 
 						++day;
@@ -183,10 +189,14 @@
 						cellClasses += 'fc-past ';
 					}
 					if( content !== '' ) {
-						cellClasses += 'fc-content';
+						cellClasses += 'fc-content ';
+					}
+					cellClasses += "mm-cell ";
+					if(mmcrossed) {
+						cellClasses += "mm-crossed";
 					}
 
-					html += cellClasses !== '' ? '<div class="' + cellClasses + '">' : '<div>';
+					html += cellClasses !== '' ? '<div class="' + cellClasses + '" title="' + content +'">' : '<div>';
 					html += inner;
 					html += '</div>';
 
@@ -291,7 +301,10 @@
 		setData : function( caldata ) {
 
 			caldata = caldata || {};
-			$.extend( this.caldata, caldata );
+			$.extend( this.caldata, caldata  );
+			for( var key in this.caldata ) {
+				console.log( key + ' = ' + this.caldata[ key ] );
+			}
 			this._generateTemplate();
 
 		},

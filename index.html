@@ -10,9 +10,165 @@
 		<meta name="keywords" content="responsive, calendar, jquery, plugin, full page, flexible, javascript, css3, media queries" />
 		<meta name="author" content="Codrops" />
 		<link rel="shortcut icon" href="../favicon.ico"> 
+		
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+		<link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.css" />
+		
 		<link rel="stylesheet" type="text/css" href="css/calendar.css" />
 		<link rel="stylesheet" type="text/css" href="css/custom_1.css" />
 		<script src="js/modernizr.custom.63321.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/jquery.calendario.js"></script>
+		<script type="text/javascript" src="js/data.js"></script>
+		
+		<style>
+			.mm-crossed {
+				background-image: url('red_cross_2.svg');
+				background-repeat: no-repeat;
+				background-size: 100% 100%;
+				background-position: 0% 0%;
+			}
+		</style>
+		<script type="text/javascript">	
+			$(function() {
+				var dd;
+				
+				var cal = $( '#calendar' ).calendario( {
+						onDayClick : function( $el, $contentEl, dateProperties ) {
+							//dd = (dateProperties['month'] < 10 ? '0' + dateProperties['month'] : dateProperties['month']) + '-' + ( dateProperties['day'] < 10 ? '0' + dateProperties['day'] : dateProperties['day'] ) + '-' + dateProperties['year'];
+							//dd = dateProperties;
+							//console.log(dd);
+							
+							var mmNow = new Date();
+							var eventDate = new Date(dateProperties['year'], dateProperties['month']-1, dateProperties['day']);
+							console.log(mmNow);
+							console.log(eventDate);
+							if (eventDate > mmNow) {
+								alert("Haha, no, you can't predict the future.");
+							}
+							else{
+								dd = (dateProperties['month'] < 10 ? '0' + dateProperties['month'] : dateProperties['month']) + '-' + ( dateProperties['day'] < 10 ? '0' + dateProperties['day'] : dateProperties['day'] ) + '-' + dateProperties['year'];
+								$( "#dialog-form" ).dialog( "open" );
+							}
+							for( var key in dateProperties ) {
+								console.log( key + ' = ' + dateProperties[ key ] );
+							}
+
+						}
+					} ),
+					$month = $( '#custom-month' ).html( cal.getMonthName() ),
+					$year = $( '#custom-year' ).html( cal.getYear() );
+
+				$( '#custom-next' ).on( 'click', function() {
+					cal.gotoNextMonth( updateMonthYear );
+				} );
+				$( '#custom-prev' ).on( 'click', function() {
+					cal.gotoPreviousMonth( updateMonthYear );
+				} );
+				$( '#custom-current' ).on( 'click', function() {
+					cal.gotoNow( updateMonthYear );
+				} );
+				function updateMonthYear() {				
+					$month.html( cal.getMonthName() );
+					$year.html( cal.getYear() );
+				}
+			
+				var name = $( "#title" ),
+					  allFields = $( [] ).add( name ),
+					  tips = $( ".validateTips" );
+					var clickedDay, clickedDate;
+				 
+					function updateTips( t ) {
+					  tips
+						.text( t )
+						.addClass( "ui-state-highlight" );
+					  setTimeout(function() {
+						tips.removeClass( "ui-state-highlight", 1500 );
+					  }, 500 );
+					}
+				 
+					function checkLength( o, n, min, max ) {
+					  if ( o.val().length > max || o.val().length < min ) {
+						o.addClass( "ui-state-error" );
+						updateTips( "Come on, enter at least " +
+						  min + " and at most " + max + " characters." );
+						return false;
+					  } else {
+						return true;
+					  }
+					}
+				 
+					$( "#dialog-form" ).dialog({
+					  autoOpen: false,
+					  height: 300,
+					  width: 350,
+					  modal: true,
+					  buttons: {
+						"Check!": function() {
+						  var bValid = true;
+						  allFields.removeClass( "ui-state-error" );
+				 
+						  bValid = bValid && checkLength( name, "username", 3, 150 );
+				 
+						  if ( bValid ) {
+							console.log(dd);
+							obj = {};
+							obj[dd] = name.val();
+							cal.setData( obj );
+							$( this ).dialog( "close" );
+						  }
+						},
+						Cancel: function() {
+						  $( this ).dialog( "close" );
+						}
+					  },
+					  close: function() {
+						allFields.val( "" ).removeClass( "ui-state-error" );
+					  }
+					});
+			
+				
+
+				// you can also add more data later on. As an example:
+				
+				/*$('.mm-cell').on( 'click', function() {
+					console.log('calling setdata');
+					cal.setData( {
+								dd : 'Test event!!!'
+							} );
+					// goes to a specific month/year
+					//cal.goto( 3, 2013, updateMonthYear );
+
+				} );*/
+				
+				$('.mm-cell').tooltip();
+				
+				/*$('.mm-cell').hover(function() {
+					console.log( "we are in teh hovers" );
+					var doc = this;
+					var notes = null;
+					for (var i = 0; i < doc.childNodes.length; i++) {
+						if (doc.childNodes[i].className == "mm-content") {
+						  notes = doc.childNodes[i];
+						  var obj = {}
+						  obj['title'] = notes;
+						  for( var key in obj ) {
+								console.log( key + ' = ' + obj[ key ] );
+							}
+						  obj['placement'] = 'right';
+						  doc.tooltip(obj);
+						  break;
+						}        
+					}
+				});*/
+				
+			
+			});
+		</script>
+		
 	</head>
 	<body>
 		<div class="container">	
@@ -39,56 +195,20 @@
 				<div id="calendar" class="fc-calendar-container"></div>
 			</div>
 		</div><!-- /container -->
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-		<script type="text/javascript" src="js/jquery.calendario.js"></script>
-		<script type="text/javascript" src="js/data.js"></script>
-		<script type="text/javascript">	
-			$(function() {
-			
-				var cal = $( '#calendar' ).calendario( {
-						onDayClick : function( $el, $contentEl, dateProperties ) {
-
-							for( var key in dateProperties ) {
-								console.log( key + ' = ' + dateProperties[ key ] );
-							}
-
-						},
-						caldata : codropsEvents
-					} ),
-					$month = $( '#custom-month' ).html( cal.getMonthName() ),
-					$year = $( '#custom-year' ).html( cal.getYear() );
-
-				$( '#custom-next' ).on( 'click', function() {
-					cal.gotoNextMonth( updateMonthYear );
-				} );
-				$( '#custom-prev' ).on( 'click', function() {
-					cal.gotoPreviousMonth( updateMonthYear );
-				} );
-				$( '#custom-current' ).on( 'click', function() {
-					cal.gotoNow( updateMonthYear );
-				} );
-
-				function updateMonthYear() {				
-					$month.html( cal.getMonthName() );
-					$year.html( cal.getYear() );
-				}
-
-				// you can also add more data later on. As an example:
-				/*
-				someElement.on( 'click', function() {
-					
-					cal.setData( {
-						'03-01-2013' : '<a href="#">testing</a>',
-						'03-10-2013' : '<a href="#">testing</a>',
-						'03-12-2013' : '<a href="#">testing</a>'
-					} );
-					// goes to a specific month/year
-					cal.goto( 3, 2013, updateMonthYear );
-
-				} );
-				*/
-			
-			});
-		</script>
+		
+		
+		
+		
+		
+		<div id="dialog-form" title="">
+		  <p class="validateTips">Entering this information will help you keep track.</p>
+		 
+		  <form>
+		  <fieldset>
+			<label for="title">What didju do? (Enter the name of the file you wrote or the number or push ups you did, for example)</label>
+			<input type="text" name="title" id="title" class="text ui-widget-content ui-corner-all" />
+		  </fieldset>
+		  </form>
+		</div>
 	</body>
 </html>
